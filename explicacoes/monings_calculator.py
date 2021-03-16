@@ -108,7 +108,7 @@ def main():
     explode[-1] = 0.05
 
     plt.pie([v for v in peoples.values()], labels = [k for k in peoples.keys()], autopct='%1.0f%%', explode = explode)
-    text= 'Monings entre ' + start_pretty + ' e ' + end_pretty + ': ' + str(int(monings_total))+'€'
+    text= 'Monings between ' + start_pretty + ' and ' + end_pretty + ': ' + str(int(monings_total))+'€'
     plt.xlabel(text)
     plt.show()
     exit()
