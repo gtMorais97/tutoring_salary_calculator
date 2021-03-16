@@ -9,20 +9,40 @@ from dateutil.parser import parse as dtparse
 from datetime import datetime as dt
 import matplotlib.pyplot as plt
 import numpy as np
+import sys
+import re
 
 # If modifying these scopes, delete the file token.pickle.
 SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
 
-preco_hora = 20
 
-start_string = '2021-01-01T01:00:00'
-end_string = '2021-01-31T23:00:00'
-
-iso_format = '%Y-%m-%dT%H:%M:%SZ'
-START_DATE = dt.strftime(dtparse(start_string), format=iso_format)
-END_DATE = dt.strftime(dtparse(end_string), format=iso_format)
 
 def main():
+    args = sys.argv
+    if len(args) < 4:
+        raise Exception('Please provide start and end date (dd/mm/yyyy) and price per hour')
+    start_arg = '/'.join(args[1].split('/'))
+    end_arg = '/'.join(args[2].split('/'))
+
+    date_regex = re.compile('(^(((0[1-9]|1[0-9]|2[0-8])[\/](0[1-9]|1[012]))|((29|30|31)[\/](0[13578]|1[02]))|((29|30)[\/](0[4,6,9]|11)))[\/](19|[2-9][0-9])\d\d$)|(^29[\/]02[\/](19|[2-9][0-9])(00|04|08|12|16|20|24|28|32|36|40|44|48|52|56|60|64|68|72|76|80|84|88|92|96)$)')
+    match_start = bool(date_regex.match(start_arg))
+    match_end = bool(date_regex.match(end_arg))
+    print(match_start)
+    print(match_end)
+    if not match_start or not match_end:
+        raise Exception('Invalid date. Format is dd/mm/yyyy.')
+    start_arg = '-'.join(start_arg.split('/')[::-1])
+    end_arg = '-'.join(end_arg.split('/')[::-1])
+                       
+    preco_hora = int(args[3])
+
+    start_string = start_arg + 'T01:00:00' if start_arg else '2021-01-01T01:00:00'
+    end_string = end_arg + 'T23:00:00' if end_arg else '2021-01-31T23:00:00'
+
+    iso_format = '%Y-%m-%dT%H:%M:%SZ'
+    START_DATE = dt.strftime(dtparse(start_string), format=iso_format)
+    END_DATE = dt.strftime(dtparse(end_string), format=iso_format)
+    
     """Shows basic usage of the Google Calendar API.
     Prints the start and name of the next 10 events on the user's calendar.
     """
@@ -91,6 +111,7 @@ def main():
     text= 'Monings entre ' + start_pretty + ' e ' + end_pretty + ': ' + str(int(monings_total))+'€'
     plt.xlabel(text)
     plt.show()
+    exit()
 
 
 if __name__ == '__main__':
